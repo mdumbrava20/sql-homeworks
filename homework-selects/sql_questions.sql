@@ -129,21 +129,77 @@ WHERE SALARY between (SELECT min(SALARY) FROM EMPLOYEES) AND 2500;
 select *
 from EMPLOYEES
 where DEPARTMENT_ID not in (select distinct DEPARTMENT_ID
-                        from EMPLOYEES
-                        where EMPLOYEE_ID between 100 and 200 AND
-                            DEPARTMENT_ID is not null );
+                            from EMPLOYEES
+                            where EMPLOYEE_ID between 100 and 200
+                              AND DEPARTMENT_ID is not null);
 
 --22. all the information for those employees whose id is any id who earn the second highest salary.
-
+select *
+from EMPLOYEES
+where SALARY = (select max(SALARY)
+                from EMPLOYEES
+                where EMPLOYEE_ID != (select EMPLOYEE_ID
+                                      from EMPLOYEES
+                                      where SALARY = (select max(SALARY) from EMPLOYEES)));
 
 --23. the employee name( first name and last name ) and hiredate for all employees in the same department as Clara. Exclude Clara.
+select FIRST_NAME, LAST_NAME, HIRE_DATE
+from EMPLOYEES
+where DEPARTMENT_ID = (select DEPARTMENT_ID
+                       from EMPLOYEES
+                       where FIRST_NAME = 'Clara')
+  and FIRST_NAME != 'Clara';
+
 --24. the employee number and name( first name and last name ) for all employees who work in a department with any employee whose name contains a T.
+select PHONE_NUMBER, FIRST_NAME, LAST_NAME
+from EMPLOYEES
+where DEPARTMENT_ID in (select DEPARTMENT_ID
+                        from EMPLOYEES
+                        where LAST_NAME like ('%T%')
+                           or FIRST_NAME like ('%T%'));
+
 --25. full name(first and last name), job title, starting and ending date of last jobs for those employees with worked without a commission percentage.
+select distinct employee.EMPLOYEE_ID, JOBS.JOB_ID, jobh.EMPLOYEE_ID
+from EMPLOYEES employee
+         inner join JOBS jobs
+                    on employee.JOB_ID = jobs.JOB_ID
+         left join JOB_HISTORY jobh
+                   on employee.EMPLOYEE_ID = jobh.EMPLOYEE_ID
+where COMMISSION_PCT is null;
+
 --26. the employee number, name( first name and last name ), and salary for all employees who earn more than the average salary and who work in a department with any employee with a J in their name.
+select PHONE_NUMBER, FIRST_NAME, LAST_NAME, SALARY
+from EMPLOYEES
+where SALARY > (select avg(SALARY) from EMPLOYEES)
+  AND DEPARTMENT_ID in (select DEPARTMENT_ID
+                        from EMPLOYEES
+                        where FIRST_NAME like ('%J%')
+                           or LAST_NAME like ('%J%'));
+
 --27. the employee number, name( first name and last name ) and job title for all employees whose salary is smaller than any salary of those employees whose job title is MK_MAN.
+select PHONE_NUMBER, FIRST_NAME, LAST_NAME, JOB_TITLE
+from EMPLOYEES employee1
+    inner join JOBS using (JOB_ID)
+where SALARY < any (select SALARY
+                from EMPLOYEES
+                where JOB_ID = 'MK_MAN');
+
 --28. the employee number, name( first name and last name ) and job title for all employees whose salary is smaller than any salary of those employees whose job title is MK_MAN. Exclude Job title MK_MAN.
+--TODO SAME CONDITION ?
+
 --29. all the information of those employees who did not have any job in the past.
+select *
+from EMPLOYEES
+where EMPLOYEE_ID not in (select distinct EMPLOYEE_ID from JOB_HISTORY);
+
 --30. the employee number, name( first name and last name ) and job title for all employees whose salary is more than any average salary of any department.
+select PHONE_NUMBER, FIRST_NAME, LAST_NAME, JOB_TITLE
+from EMPLOYEES
+    inner join JOBS using (JOB_ID)
+where SALARY > any (select avg(SALARY)
+                    from EMPLOYEES
+                    group by DEPARTMENT_ID);
+
 --31. the employee id, name ( first name and last name ) and the job id column with a modified title SALESMAN for those employees whose job title is ST_MAN and DEVELOPER for whose job title is IT_PROG.
 --32. the employee id, name ( first name and last name ), salary and the SalaryStatus column with a title HIGH and LOW respectively for those employees whose salary is more than and less than the average salary of all employees.
 --33. the employee id, name ( first name and last name ), SalaryDrawn, AvgCompare (salary - the average salary of all employees)
@@ -151,6 +207,7 @@ where DEPARTMENT_ID not in (select distinct DEPARTMENT_ID
 -- the average salary of all employees.
 --34. all the employees who earn more than the average and who work in any of the IT departments.
 --35. who earns more than Mr. Ozer.
+
 --36. which employees have a manager who works for a department based in the US.
 --37. the names of all employees whose salary is greater than 50% of their department’s total salary bill.
 --38. the employee id, name ( first name and last name ), salary, department name and city for all
