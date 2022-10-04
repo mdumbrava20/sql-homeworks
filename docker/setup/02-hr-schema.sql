@@ -2528,7 +2528,7 @@ BEGIN
 END secure_dml; 
 /
 
--- trigger on EMPLOYEES to invoke the SECURE_DML procedure
+-- trigger.sql on EMPLOYEES to invoke the SECURE_DML procedure
 CREATE OR REPLACE TRIGGER secure_employees  
   BEFORE INSERT OR UPDATE OR DELETE ON employees  
 BEGIN  
@@ -2536,7 +2536,7 @@ BEGIN
 END secure_employees; 
 /
 
--- disable SECURE_EMPLOYEES trigger so data can be used at any time (given that this is a sample schema)
+-- disable SECURE_EMPLOYEES trigger.sql so data can be used at any time (given that this is a sample schema)
 ALTER TRIGGER secure_employees DISABLE;
 
 -- procedure to add a row to the JOB_HISTORY table
@@ -2555,7 +2555,7 @@ BEGIN
 END add_job_history; 
 /
 
--- row trigger to call the ADD_JOB_HISTORY procedure when data is updated in the job_id or department_id columns in the EMPLOYEES table
+-- row trigger.sql to call the ADD_JOB_HISTORY procedure when data is updated in the job_id or department_id columns in the EMPLOYEES table
 CREATE OR REPLACE TRIGGER update_job_history  
   AFTER UPDATE OF job_id, department_id ON employees  
   FOR EACH ROW  
